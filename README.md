@@ -294,7 +294,7 @@ micro:bit          |      √       |              |             |
 
 ## 创作者
 
-Written by Actor (wenzheng.wang@dfrobot.com), 2019. (Welcome to our [website](https://www.dfrobot.com/))
+Written by Actor (jie.tang@dfrobot.com), 2019. (Welcome to our [website](https://www.dfrobot.com/))
 
 
 
