@@ -1,3 +1,13 @@
+/*!
+ * @file DFRobot_HumanDetection.h
+ * @brief 这是人体毫米波驱动库的声明部分
+ * @copyright   Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
+ * @License     The MIT License (MIT)
+ * @author [tangjie](jie.tang@dfrobot.com)
+ * @version  V1.0
+ * @date  2024-06-03
+ * @url https://github.com/DFRobot/DFRobot_HumanDetection
+ */
 #ifndef _DFROBOT_HUMAN_DETECTION_
 #define _DFROBOT_HUMAN_DETECTION_
 #include "Arduino.h"
@@ -88,11 +98,10 @@ public:
     */
     typedef enum
     {
-        // eHumanPresenceSwitch, ///<人体存在开关查询
         eHumanPresence,       ///<人体存在查询
         eHumanMovement,       ///<运动信息查询
         eHumanMovingRange,    ///<移动距离，范围 0~100
-        eHumanDistance,       ///<人体距离
+        eHumanDistance,
         
     }esmHuman;
 
@@ -105,6 +114,7 @@ public:
         eInOrNotInBed,///<获取入床或离床状态
         eSleepState,///<获取睡眠状体
         eWakeDuration,///<获取清醒时长
+        eLightsleep,///<浅睡眠
         eDeepSleepDuration,///<获取深睡眠时长
         eSleepQuality,///<获取睡眠质量
         eSleepDisturbances,///<睡眠异常查询
@@ -115,6 +125,7 @@ public:
         eUnattendedSwitch,///<无人计时开关查询
         eUnattendedTime,///<无人计时时间查询
         esleepDeadline,///<睡眠截止时间
+        eReportingmode,//上报模式
     }eSmSleep;
 
     /**
@@ -122,17 +133,13 @@ public:
     */
     typedef enum
     {
-        eSleepStateC,///<获取睡眠状体
+        eReportingmodeC,///<上报模式
         eAbnormalStruggleC,///<异常挣扎
         eUnattendedStateC,///<无人计时
         eUnattendedTimeC,///<无人计时时间
         esleepDeadlineC,///<睡眠截止时间
 
     }eSmSleepConfig;
-
-    
-
-    
 
     /**
      * @brief 跌倒模式下人体数据
@@ -255,25 +262,6 @@ public:
     */
     uint8_t sensorRet(void);
 
-    // /**
-    //  * @fn getInitState
-    //  * @brief 获取初始化是否完成状态
-    //  * @return 返回初始化状态
-    //  * @retval 0 已完成
-    //  * @retval 1 未完成
-    // */
-    // uint8_t getInitState(void);
-
-    // /**
-    //  * @fn smHumanSwitch
-    //  * @brief 控制人力存在功能的开关
-    //  * @param sw 0 打开 1 关闭
-    //  * @return 返回控制状态
-    //  * @retval 0 打开成功
-    //  * @retval 1 打开失败
-    // */
-    // uint8_t smHumanSwitch(uint8_t sw);
-
     /**
      * @fn smHumanData
      * @brief 查询在睡眠模式下人体相关的内容
@@ -282,58 +270,13 @@ public:
     uint16_t smHumanData(esmHuman hm);
 
     /**
-     * @fn smHumanLocation
-     * @brief 获取人体方位数据
-     * @param x X 坐标
-     * @param y y 坐标
-     * @param z Z 坐标
-    */
-    void smHumanLocation(int16_t *x, int16_t *y, int16_t *z);
-
-    // /**
-    //  * @fn smHeartRateSwitch
-    //  * @brief 心率检测开关
-    //  * @param sw 开关 1 打开 0 关闭
-    //  * @return 返回控制状态
-    //  * @retval 1 打开
-    //  * @retval 0 关闭
-    // */
-    // uint8_t  smHeartRateSwitch(uint8_t sw);
-
-    // /**
-    //  * @fn getHeartRateSwitch
-    //  * @brief 获取心率开关状态
-    //  * @return 返回心率状态
-    //  * @retval 1 打开
-    //  * @retval 0 关闭
-    // */
-    // uint8_t getHeartRateSwitch(void);
-
-    /**
      * @fn gitHeartRate
      * @brief 获取心率
      * @return 返回心率
     */
     uint8_t gitHeartRate(void);
 
-    // /**
-    //  * @fn smBreatheSwitch
-    //  * @brief 呼吸检测开关
-    //  * @param sw 开关控制 0 关闭 1 打开
-    //  * @return 返回控制状态
-    //  * @retval 0 关闭
-    //  * @retval 1 打开
-    // */
-    // uint8_t smBreatheSwitch(uint8_t sw);
 
-    // /**
-    //  * @fn getBreatheSwitch
-    //  * @brief 获取呼吸开关状态
-    //  * @return 返回呼吸开关状态
-    //  * @retval 0 关闭
-    //  * @retval 1 打开
-    // */
-    // uint8_t getBreatheSwitch(void);
 
     /**
      * @fn getBreatheState
@@ -353,18 +296,9 @@ public:
     */
     uint8_t getBreatheValue(void);
 
-    // /**
-    //  * @fn smSleepSwitch
-    //  * @brief 睡眠检测功能开关
-    //  * @param sw 开关控制 0 关 1 开
-    //  * @return 返回控制状态
-    //  * @retval 0 关闭
-    //  * @return 1 打开
-    // */
-    // uint8_t smSleepSwitch(uint8_t sw);
 
     /**
-     * @fn getSleepSwitch
+     * @fn smSleepData
      * @brief 获取睡眠相关数据
      * @param sl 需要获取的数据
      * @return 返回获取的数据
@@ -433,16 +367,11 @@ public:
     */
     uint16_t dmAutoMeasureHeight(void);
 
-    // /**
-    //  * @fn dmHumanSwitch
-    //  * @brief 跌倒模式下的人体存在开关
-    //  * @param sw 开关数据 0 开，1 关
-    // */
-    // void dmHumanSwitch(uint8_t sw);
 
     /**
      * @fn dmHumanData
      * @brief 在跌倒模式下获取人体相关数据
+     * @return 返回获取数据
     */
     uint16_t dmHumanData(eDmHuman dh);
     
@@ -466,13 +395,6 @@ public:
      * @brief 无人时间查询
     */
     uint32_t unmannedTime(void);
-
-    // /**
-    //  * @fn fallSwitch
-    //  * @brief 跌倒模式开关
-    //  * @param sw 控制跌倒模式 0 关 1 打开
-    // */
-    // void fallSwitch(uint8_t sw);
 
     /**
      * @fn getFallData
@@ -526,6 +448,12 @@ public:
     uint8_t unattendedTimeConfig(uint32_t time);
     /**
      * @fn dmFallConfig
+     * @brief 跌倒模式配置
+     * @param con 配置选项
+     * @param data 配置数据
+     * @return 返回配置状态
+     * @retval 0 成功
+     * @retval 1 失败
      * 
     */
     uint8_t dmFallConfig(eDmFallConfig con, uint32_t data);

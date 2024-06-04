@@ -1,4 +1,13 @@
-
+/*!
+ * @file DFRobot_HumanDetection.cpp
+ * @brief 这是人体毫米波驱动库的实现部分
+ * @copyright   Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
+ * @License     The MIT License (MIT)
+ * @author [tangjie](jie.tang@dfrobot.com)
+ * @version  V1.0
+ * @date  2024-06-03
+ * @url https://github.com/DFRobot/DFRobot_HumanDetection
+ */
 #include "DFRobot_HumanDetection.h"
 #include "stdio.h"
 
@@ -31,24 +40,6 @@ uint8_t DFRobot_HumanDetection::configWorkMode(eWorkMode mode){
         delay(100);
     }
     delay(100);
-    if(mode == eSleepMode){
-        while(getData(0x85,0x00,1,&data,buf) != 0){//关闭心率主动上报
-            delay(100);
-        }
-        delay(100);
-        while(getData(0x81,0x00,1,&data,buf) != 0){//关闭呼吸主动上报
-            delay(100);
-        }
-        delay(100);
-        while(getData(0x84,0x00,1,&data,buf) != 0){//关闭睡眠检测主动上报
-            delay(100);
-        }
-        delay(100);
-    }else{
-        while(getData(0x83,0x00,1,&data,buf) != 0){//关闭跌倒检测主动上报
-            delay(100);
-        }
-    }
     return 0;
 }
 
@@ -104,14 +95,6 @@ uint8_t DFRobot_HumanDetection::sensorRet(void){
     return 1;
 }
 
-// uint8_t DFRobot_HumanDetection::getInitState(void){
-//     uint8_t data = 0x0f,ret = 3;
-//     uint8_t buf[10];
-//     if(getData(0x05,0x81,1,&data,buf) == 0){
-//         ret = buf[6];
-//     }
-//     return ret;
-//    }
 
 uint16_t DFRobot_HumanDetection::smHumanData(esmHuman hm){
     uint8_t data = 0x0f;
@@ -145,20 +128,6 @@ uint16_t DFRobot_HumanDetection::smHumanData(esmHuman hm){
     return ret;
 } 
 
-void DFRobot_HumanDetection::smHumanLocation(int16_t *x, int16_t *y, int16_t *z){
-    uint8_t data = 0x0f;
-    uint8_t buf[15];
-    if(getData(0x80,0x85,1,&data,buf) == 0){
-            *x = (int16_t)(buf[6] << 8 | buf[7]);
-            *y = (int16_t)(buf[8] << 8 | buf[9]);
-            *z = (int16_t)(buf[10] << 8 | buf[11]);
-    }else{
-        *x = 0;
-        *y = 0;
-        *z = 0;
-    }
-
-}
 
 uint8_t DFRobot_HumanDetection::gitHeartRate(void){
     uint8_t data = 0x0f,ret= 0xff;
@@ -194,6 +163,11 @@ uint16_t DFRobot_HumanDetection::smSleepData(eSmSleep sl){
 
     switch (sl)
     {
+    case eReportingmode:
+        if(getData(0x84,0x8C,1,&data,buf) == 0){
+            ret = buf[6];
+        }
+    break;
     case eInOrNotInBed:
         if(getData(0x84,0x81,1,&data,buf) == 0){
             ret = buf[6];
@@ -203,10 +177,14 @@ uint16_t DFRobot_HumanDetection::smSleepData(eSmSleep sl){
         if(getData(0x84,0x82,1,&data,buf) == 0){
             ret = buf[6];
         }
-
     break;
     case eWakeDuration:
         if(getData(0x84,0x83,1,&data,buf) == 0){
+            ret = buf[6] << 8 | buf[7];
+        }
+    break;
+    case eLightsleep:
+        if(getData(0x84,0x84,1,&data,buf) == 0){
             ret = buf[6] << 8 | buf[7];
         }
     break;
@@ -288,7 +266,7 @@ sSleepComposite DFRobot_HumanDetection::getSleepComposite(void){
 
 sSleepStatistics DFRobot_HumanDetection::getSleepStatistics(void){
     uint8_t data = 0x0f;
-    uint8_t buf[20];
+    uint8_t buf[22];
     sSleepStatistics sleepSta={ 
         .sleepQualityScore = 0,
         .sleepTime = 0,
@@ -314,8 +292,10 @@ uint8_t DFRobot_HumanDetection::configSleep(eSmSleepConfig sl,uint8_t data){
     uint8_t buf[15];
     switch (sl)
     {
-    case eSleepStateC://待定
-
+    case eReportingmodeC://待定
+        if(getData(0x84,0x0F,1,&data,buf) == 0){
+            return 0;
+        }
     break;
     case eAbnormalStruggleC:
         if(getData(0x84,0x13,1,&data,buf) == 0){
@@ -346,7 +326,12 @@ uint8_t DFRobot_HumanDetection::configSleep(eSmSleepConfig sl,uint8_t data){
 void DFRobot_HumanDetection::dmInstallAngle(int16_t x, int16_t y, int16_t z){
     uint8_t sendBuf[6];
     uint8_t readBuf[15];
-    
+    senData[0] = x >> 8 & 0xff
+    senData[1] = x & 0xff
+    senData[2] = y >> 8 & 0xff
+    senData[3] = y & 0xff
+    senData[4] = z >> 8 & 0xff
+    senData[5] = y & 0xff
     if(getData(0x06,0x01,6,sendBuf,readBuf) == 0){
 
     }
@@ -422,12 +407,12 @@ uint16_t DFRobot_HumanDetection::dmHumanData(eDmHuman dh){
         }
     break;
     case eSeatedHorizontalDistance:
-        if(getData(0x83,0x8D,1,&data,readBuf) == 0){
+        if(getData(0x80,0x8D,1,&data,readBuf) == 0){
             ret = readBuf[6] << 8 | readBuf[7];
         }
     break;
     case eMotionHorizontalDistance:
-        if(getData(0x83,0x8e,1,&data,readBuf) == 0){
+        if(getData(0x80,0x8e,1,&data,readBuf) == 0){
             ret = readBuf[6] << 8 | readBuf[7];
         }
     break;
@@ -463,7 +448,7 @@ uint32_t DFRobot_HumanDetection::unmannedTime(void){
     uint8_t readBuf[15];
     uint8_t data = 0x0f;
     uint32_t ret = 0;
-    if(getData(0x83,0x92,1,&data,readBuf) == 0){
+    if(getData(0x80,0x92,1,&data,readBuf) == 0){
         ret = readBuf[6]<<24 | readBuf[7]<<16 | readBuf[8]<<8 | readBuf[9];
     }
     return ret;
@@ -540,6 +525,7 @@ uint32_t DFRobot_HumanDetection::accumulatedHeightDuration(void){
     if(getData(0x83,0x8F,1,&data,readBuf) == 0){
         ret = readBuf[6]<<24 | readBuf[7]<<16 | readBuf[8]<<8 | readBuf[9];
     }
+    
     return ret;
 }
 
@@ -553,12 +539,12 @@ uint8_t DFRobot_HumanDetection::dmHumanConfig(eDmHumanConfig con,uint16_t data){
     switch (con)
     {
     case eSeatedHorizontalDistanceC:
-        if(getData(0x80,0x8D,2,sendBuf,readBuf) == 0){
+        if(getData(0x80,0x0D,2,sendBuf,readBuf) == 0){
             ret = 0;
         }
     break;
     case eMotionHorizontalDistanceC:
-        if(getData(0x80,0x8E,2,sendBuf,readBuf) == 0){
+        if(getData(0x80,0x0E,2,sendBuf,readBuf) == 0){
             ret = 0;
         }
     break;
@@ -576,7 +562,7 @@ uint8_t DFRobot_HumanDetection::unattendedTimeConfig(uint32_t time){
     sendBuf[2] = time >> 8 & 0xff;
     sendBuf[3] = time & 0xff;
     uint8_t ret = 1;
-    if(getData(0x80,0x92,4,sendBuf,readBuf) == 0){
+    if(getData(0x80,0x12,4,sendBuf,readBuf) == 0){
         ret = 0;
     }
     return ret;
@@ -685,7 +671,7 @@ uint8_t DFRobot_HumanDetection::getData(uint8_t con, uint8_t cmd, uint16_t len, 
         
         // Update timeout check
         if ((millis() - timeStart) > TIME_OUT) {
-            //DBG("time out");
+            delay(50);
             return 2;
         }
         
@@ -746,14 +732,14 @@ uint8_t DFRobot_HumanDetection::getData(uint8_t con, uint8_t cmd, uint16_t len, 
                 break;
             case CMD_END_L:
                 retData[8 + _len] = data;
-                //DBG("CMD_END_L");
+                delay(50);
                 return 0;
             default:
                 break;
         }
         //delay(1);
     }
-
+delay(50);
 return 0;
 }
 
