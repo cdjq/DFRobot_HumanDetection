@@ -1,6 +1,6 @@
 /*!
  * @file DFRobot_HumanDetection.h
- * @brief 这是人体毫米波驱动库的声明部分
+ * @brief This is the declaration part of the human millimeter-wave driver library
  * @copyright   Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @License     The MIT License (MIT)
  * @author [tangjie](jie.tang@dfrobot.com)
@@ -8,6 +8,7 @@
  * @date  2024-06-03
  * @url https://github.com/DFRobot/DFRobot_HumanDetection
  */
+
 #ifndef _DFROBOT_HUMAN_DETECTION_
 #define _DFROBOT_HUMAN_DETECTION_
 #include "Arduino.h"
@@ -18,18 +19,26 @@
 #include "HardwareSerial.h"
 #endif
 
-#define ENABLE_DBG ///< 打开这个宏, 可以看到程序的详细运行过程
+//#define ENABLE_DBG ///< Uncomment this macro to see detailed runtime process of the program
 #ifdef ENABLE_DBG
-#define DBG(...) {Serial.print("[");Serial.print(__FUNCTION__); Serial.print("(): "); Serial.print(__LINE__); Serial.print(" ] "); Serial.println(__VA_ARGS__);}
+#define DBG(...)                     \
+    {                                \
+        Serial.print("[");           \
+        Serial.print(__FUNCTION__);  \
+        Serial.print("(): ");        \
+        Serial.print(__LINE__);      \
+        Serial.print(" ] ");         \
+        Serial.println(__VA_ARGS__); \
+    }
 #else
 #define DBG(...)
 #endif
 
-#define TIME_OUT  5 *1000
+#define TIME_OUT 5 * 1000
 
 #define CMD_HEAD 0
 #define CMD_CONFIG 1
-#define CMD_CMD   2
+#define CMD_CMD 2
 #define CMD_LEN_H 3
 #define CMD_LEN_L 4
 #define CMD_END_H 5
@@ -38,443 +47,441 @@
 #define CMD_DATA 8
 
 /**
-     * @brief 睡眠综合状态数据
-    */
-    typedef struct 
-    {
-        uint8_t presence; ///<存在状态
-        uint8_t sleepState;///<睡眠状态
-        uint8_t averageRespiration;///<平均呼吸
-        uint8_t averageHeartbeat;///<平均心跳
-        uint8_t turnoverNumber;///翻身次数
-        uint8_t largeBodyMove;///<大幅度体动占比
-        uint8_t minorBodyMove;///<小幅度体动占比
-        uint8_t apneaEvents;///<呼吸暂停次数
+ * @brief Sleep composite state data
+ */
+typedef struct
+{
+    uint8_t presence;           ///< Presence state
+    uint8_t sleepState;         ///< Sleep state
+    uint8_t averageRespiration; ///< Average respiration
+    uint8_t averageHeartbeat;   ///< Average heartbeat
+    uint8_t turnoverNumber;     /// Turnover number
+    uint8_t largeBodyMove;      ///< Large body movement percentage
+    uint8_t minorBodyMove;      ///< Minor body movement percentage
+    uint8_t apneaEvents;        ///< Apnea events
 
-    }sSleepComposite;
+} sSleepComposite;
 
-    /**
-     * @brief 睡眠统计查询
-    */
-    typedef struct 
-    {
-        uint8_t sleepQualityScore;///<睡眠质量评分
-        uint16_t sleepTime; ///<睡眠时长 单位：分钟
-        uint8_t wakeDuration;///<清醒时长
-        uint8_t shallowSleepPercentage;///<浅睡时长占比
-        uint8_t deepSleepPercentage; ///<深睡时长占比
-        uint8_t timeOutOfBed;///<离床时长
-        uint8_t exitCount; ///<离床次数
-        uint8_t turnOverCount;///<翻身次数
-        uint8_t averageRespiration;///<平均呼吸
-        uint8_t averageHeartbeat; ///平均心跳
-        uint8_t apneaEvents; ///<呼吸暂停
-        
-    }sSleepStatistics;
-    
-class DFRobot_HumanDetection{
+/**
+ * @brief Sleep statistics query
+ */
+typedef struct
+{
+    uint8_t sleepQualityScore;      ///< Sleep quality score
+    uint16_t sleepTime;             ///< Sleep duration in minutes
+    uint8_t wakeDuration;           ///< Wake duration
+    uint8_t shallowSleepPercentage; ///< Shallow sleep duration percentage
+    uint8_t deepSleepPercentage;    ///< Deep sleep duration percentage
+    uint8_t timeOutOfBed;           ///< Time out of bed
+    uint8_t exitCount;              ///< Exit count
+    uint8_t turnOverCount;          ///< Turnover count
+    uint8_t averageRespiration;     ///< Average respiration
+    uint8_t averageHeartbeat;       /// Average heartbeat
+    uint8_t apneaEvents;            ///< Apnea events
+
+} sSleepStatistics;
+
+class DFRobot_HumanDetection
+{
 public:
-
     /**
-     * @brief 工作模式配置结构体
-    */
+     * @brief Working mode configuration structure
+     */
     typedef enum
     {
         eSleepMode = 0x02,
         eFallingMode = 0x01,
-    }eWorkMode;
+    } eWorkMode;
 
     /**
-     * @brief LED灯选择
-    */
+     * @brief LED light selection
+     */
     typedef enum
     {
         eFALLLed = 0x03,
         eHPLed = 0x04,
-    }eLed;
+    } eLed;
 
     /**
-     * @brief 在睡眠模式下关于人体的数据
-    */
+     * @brief Human-related data in sleep mode
+     */
     typedef enum
     {
-        eHumanPresence,       ///<人体存在查询
-        eHumanMovement,       ///<运动信息查询
-        eHumanMovingRange,    ///<移动距离，范围 0~100
+        eHumanPresence,    ///< Human presence query
+        eHumanMovement,    ///< Movement information query
+        eHumanMovingRange, ///< Movement distance, range 0~100
         eHumanDistance,
-        
-    }esmHuman;
+
+    } esmHuman;
 
     /**
-     * @brief 在睡眠模式下的睡眠数据
-    */
+     * @brief Sleep data in sleep mode
+     */
     typedef enum
     {
-        // eSleepSwitch,///<获取睡眠开关查询
-        eInOrNotInBed,///<获取入床或离床状态
-        eSleepState,///<获取睡眠状体
-        eWakeDuration,///<获取清醒时长
-        eLightsleep,///<浅睡眠
-        eDeepSleepDuration,///<获取深睡眠时长
-        eSleepQuality,///<获取睡眠质量
-        eSleepDisturbances,///<睡眠异常查询
-        eSleepQualityRating,///<睡眠质量评级
-        eAbnormalStruggle,///<异常挣扎
-        eUnattendedState,///<无人计时查询
-        eAbnormalStruggleSwitch,///<异常挣扎开关查询
-        eUnattendedSwitch,///<无人计时开关查询
-        eUnattendedTime,///<无人计时时间查询
-        esleepDeadline,///<睡眠截止时间
-        eReportingmode,//上报模式
-    }eSmSleep;
+        // eSleepSwitch,///<Get sleep switch query
+        eInOrNotInBed,           ///< Get in or out of bed status
+        eSleepState,             ///< Get sleep state
+        eWakeDuration,           ///< Get wake duration
+        eLightsleep,             ///< Shallow sleep
+        eDeepSleepDuration,      ///< Get deep sleep duration
+        eSleepQuality,           ///< Get sleep quality
+        eSleepDisturbances,      ///< Sleep abnormality query
+        eSleepQualityRating,     ///< Sleep quality rating
+        eAbnormalStruggle,       ///< Abnormal struggle
+        eUnattendedState,        ///< No one timing query
+        eAbnormalStruggleSwitch, ///< Abnormal struggle switch query
+        eUnattendedSwitch,       ///< No timing switch query
+        eUnattendedTime,         ///< No timing time query
+        esleepDeadline,          ///< Sleep deadline
+        eReportingmode,          // Reporting mode
+    } eSmSleep;
 
     /**
-     * @brief 在睡眠模式下睡眠功能配置
-    */
+     * @brief Sleep function configuration in sleep mode
+     */
     typedef enum
     {
-        eReportingmodeC,///<上报模式
-        eAbnormalStruggleC,///<异常挣扎
-        eUnattendedStateC,///<无人计时
-        eUnattendedTimeC,///<无人计时时间
-        esleepDeadlineC,///<睡眠截止时间
+        eReportingmodeC,    ///< Reporting mode
+        eAbnormalStruggleC, ///< Abnormal struggle
+        eUnattendedStateC,  ///< No timing
+        eUnattendedTimeC,   ///< No timing time
+        esleepDeadlineC,    ///< Sleep deadline
 
-    }eSmSleepConfig;
+    } eSmSleepConfig;
 
     /**
-     * @brief 跌倒模式下人体数据
-    */
+     * @brief Human data in falling mode
+     */
     typedef enum
     {
-        //eHumanSwitch,///<获取跌倒模式人体存在开关查询
-        eExistence,///<人体存在查询
-        eMotion, ///<运动查询
-        eBodyMove,///<体动查询
-        eTrajectorySwitch, ///<轨迹点开关查询
-        eSeatedHorizontalDistance,///<静坐水平距离
-        eMotionHorizontalDistance,///运动水平距
+        // eHumanSwitch,///<Get fall mode human presence switch query
+        eExistence,                ///< Human presence query
+        eMotion,                   ///< Motion query
+        eBodyMove,                 ///< Body movement query
+        eTrajectorySwitch,         ///< Trajectory point switch query
+        eSeatedHorizontalDistance, ///< Seated horizontal distance
+        eMotionHorizontalDistance, /// Motion horizontal distance
 
-    }eDmHuman;
+    } eDmHuman;
 
     /**
-     * @brief 获取跌倒数据
-    */
+     * @brief Get fall data
+     */
     typedef enum
     {
-        // eFallSwitch,///<跌倒模式开关查询
-        eFallState, ///<跌倒状态
-        eFallBreakHeight,///<跌倒打破高度
-        eHeightRatioSwitch,///<高度占比开关查询
-        estaticResidencyState,///<静止驻留状态
-        estaticResidencySwitch,///<静止驻留开关
-        eFallSensitivity,///<跌倒灵敏度
-    }eDmFall;
+        // eFallSwitch,///<Fall mode switch query
+        eFallState,             ///< Fall state
+        eFallBreakHeight,       ///< Fall break height
+        eHeightRatioSwitch,     ///< Height ratio switch query
+        estaticResidencyState,  ///< Static residency state
+        estaticResidencySwitch, ///< Static residency switch
+        eFallSensitivity,       ///< Fall sensitivity
+    } eDmFall;
 
     /**
-     * @brief 跌倒模式下人体配置
-    */
+     * @brief Human configuration in falling mode
+     */
     typedef enum
     {
-        eSeatedHorizontalDistanceC,///<静坐水平距离
-        eMotionHorizontalDistanceC,///运动水平距
-    }eDmHumanConfig;
+        eSeatedHorizontalDistanceC, ///< Seated horizontal distance
+        eMotionHorizontalDistanceC, /// Motion horizontal distance
+    } eDmHumanConfig;
 
-
-     /**
-     * @brief 获取跌倒数据
-    */
+    /**
+     * @brief Get fall data
+     */
     typedef enum
     {
-        eFallBreakHeightC,///<跌倒打破高度
-        eHeightRatioSwitchC,///<高度占比开关
-        eReportFreqC,///<轨迹点信息上报频率
-        eReportSwitchC,///<轨迹点上报开关
-        eAltTimeC,///<高度累计时间
-        eFallSensitivityC,///<跌倒灵敏度设置
-        eResidenceSwitchC,///<驻留开关
-        eResidenceTime,///<驻留时间
+        eFallBreakHeightC,   ///< Fall break height
+        eHeightRatioSwitchC, ///< Height ratio switch
+        eReportFreqC,        ///< Trajectory point information reporting frequency
+        eReportSwitchC,      ///< Trajectory point reporting switch
+        eAltTimeC,           ///< Height cumulative time
+        eFallSensitivityC,   ///< Fall sensitivity setting
+        eResidenceSwitchC,   ///< Residency switch
+        eResidenceTime,      ///< Residency time
 
-    }eDmFallConfig;
-
-
+    } eDmFallConfig;
 
     /**
      * @fn DFRobot_HumanDetection
-     * @brief 毫米波人体检测传感器的构造函数
-     * @param s 串口接收对象
-    */
+     * @brief Constructor of the millimeter-wave human detection sensor
+     * @param s Serial reception object
+     */
     DFRobot_HumanDetection(Stream *s);
-    ~DFRobot_HumanDetection(){};
+    ~DFRobot_HumanDetection() {};
 
     /**
      * @fn begin
-     * @brief 初始化传感器
-     * @return 返回初始化状态
-     * @retval 0 初始化成功
-     * @retval 1 初始化失败
-    */
+     * @brief Initialize the sensor
+     * @return Initialization status
+     * @retval 0 Initialization successful
+     * @retval 1 Initialization failed
+     */
     uint8_t begin(void);
 
     /**
      * @fn configWorkMode
-     * @brief 初始化模式
-     * @param mode 模式选择
-     * @return 返回初始化状态
-     * @retval 0 模式配置成功
-     * @retval 1 模式配置失败
-    */
+     * @brief Initialize mode
+     * @param mode Mode selection
+     * @return Initialization status
+     * @retval 0 Mode configuration successful
+     * @retval 1 Mode configuration failed
+     */
     uint8_t configWorkMode(eWorkMode mode);
 
     /**
      * @fn getWorkMode
-     * @brief 获取工作模式
-     * @return 返回工作模式
-    */
+     * @brief Get working mode
+     * @return Working mode
+     */
     uint8_t getWorkMode(void);
 
     /**
      * @fn configLEDLight
-     * @brief 配置LED灯
-     * @param led 选择打开那个LED灯
-     * @param sta 0:打开，1:关闭
-     * @return 返回控制啊状态
-     * @retval 0 配置成功
-     * @retval 1 配置失败
-    */
+     * @brief Configure LED light
+     * @param led LED selection to turn on
+     * @param sta 0: On, 1: Off
+     * @return Control status
+     * @retval 0 Configuration successful
+     * @retval 1 Configuration failed
+     */
     uint8_t configLEDLight(eLed led, uint8_t sta);
 
     /**
-     * @fn getLEDLightStatic
-     * @brief 获取LED灯的状态
-     * @param led LED灯选择
-     * @return 返回灯状态
-     * @retval 0 灯关闭
-     * @retval 1 灯打开
-    */
+     * @fn getLEDLightState
+     * @brief Get LED light status
+     * @param led LED selection
+     * @return Light status
+     * @retval 0 Light off
+     * @retval 1 Light on
+     */
     uint8_t getLEDLightState(eLed led);
 
     /**
      * @fn sensorRet
-     * @brief 复位传感器
-     * @return 返回复位状态
-     * @retval 0 复位成功
-     * @retval 1 复位失败
-    */
+     * @brief Reset the sensor
+     * @return Reset status
+     * @retval 0 Reset successful
+     * @retval 1 Reset failed
+     */
     uint8_t sensorRet(void);
 
     /**
      * @fn smHumanData
-     * @brief 查询在睡眠模式下人体相关的内容
-     * @param hm 获取数据内容选择
-    */
+     * @brief Query human-related content in sleep mode
+     * @param hm Data content selection
+     */
     uint16_t smHumanData(esmHuman hm);
 
     /**
      * @fn gitHeartRate
-     * @brief 获取心率
-     * @return 返回心率
-    */
+     * @brief Get heart rate
+     * @return Heart rate
+     */
     uint8_t gitHeartRate(void);
-
-
 
     /**
      * @fn getBreatheState
-     * @brief 获取呼吸检测信息
-     * @return 返回呼吸信息
-     * @retval 1 正常
-     * @retval 2 获取过快
-     * @retval 3 获取过慢
-     * @retval 4 无
-    */
+     * @brief Get respiration detection information
+     * @return Respiration information
+     * @retval 1 Normal
+     * @retval 2 Too fast
+     * @retval 3 Too slow
+     * @retval 4 None
+     */
     uint8_t getBreatheState(void);
 
     /**
      * @fn getBreatheValue
-     * @brief 获取呼吸数值
-     * @return 返回呼吸数值
-    */
+     * @brief Get respiration value
+     * @return Respiration value
+     */
     uint8_t getBreatheValue(void);
-
 
     /**
      * @fn smSleepData
-     * @brief 获取睡眠相关数据
-     * @param sl 需要获取的数据
-     * @return 返回获取的数据
-    */
+     * @brief Get sleep-related data
+     * @param sl Data to retrieve
+     * @return Retrieved data
+     */
     uint16_t smSleepData(eSmSleep sl);
 
     /**
      * @fn getSleepComposite
-     * @brief 睡眠综合状态查询
-     * @return 返回综合查询数据
-    */
+     * @brief Query sleep composite state
+     * @return Queryed composite data
+     */
     sSleepComposite getSleepComposite(void);
 
     /**
      * @fn getSleepStatistics
-     * @brief 睡眠统计状态查询
-     * @return 返回睡眠统计数据
-    */
+     * @brief Query sleep statistics status
+     * @return Queryed sleep statistics data
+     */
     sSleepStatistics getSleepStatistics(void);
 
     /**
      * @fn configSleep
-     * @brief 配置睡眠模式功能
-     * @param sl 功能选择
-     * @param data 配置数据
-     * @return 返回设置状态
-    */
-    uint8_t configSleep(eSmSleepConfig sl,uint8_t data);
+     * @brief Configure sleep mode function
+     * @param sl Function selection
+     * @param data Configuration data
+     * @return Setting status
+     */
+    uint8_t configSleep(eSmSleepConfig sl, uint8_t data);
 
     /**
      * @fn installAngle
-     * @brief 用于跌倒模式中雷达角度安装设置
-     * @param x x 角度
-     * @param y y 角度
-     * @param z z 角度
-    */
+     * @brief Radar angle installation setting in fall mode
+     * @param x x angle
+     * @param y y angle
+     * @param z z angle
+     */
     void dmInstallAngle(int16_t x, int16_t y, int16_t z);
 
     /**
      * @fn dmGetInstallAngle
-     * @brief 获取雷达安装角度
-     * @param x x 角度
-     * @param y y 角度
-     * @param z z 角度
-    */
+     * @brief Get radar installation angle
+     * @param x x angle
+     * @param y y angle
+     * @param z z angle
+     */
     void dmGetInstallAngle(int16_t *x, int16_t *y, int16_t *z);
 
     /**
      * @fn dmInstallHeight
-     * @brief 设置雷达安装高度
-     * @param he 安装高度
-    */
+     * @brief Set radar installation height
+     * @param he Installation height
+     */
     void dmInstallHeight(uint16_t he);
 
     /**
      * @fn dmGetInstallHeight
-     * @brief 获取安装高度
-     * @return 返回获取的安装高度
-    */
+     * @brief Get installation height
+     * @return Retrieved installation height
+     */
     uint16_t dmGetInstallHeight(void);
 
     /**
      * @fn autoMeasureHeight
-     * @brief 获取自动测高数据
-     * @return 返回自动测高数据
-    */
+     * @brief Get automatic height measurement data
+     * @return Retrieved automatic height measurement data
+     */
     uint16_t dmAutoMeasureHeight(void);
-
 
     /**
      * @fn dmHumanData
-     * @brief 在跌倒模式下获取人体相关数据
-     * @return 返回获取数据
-    */
+     * @brief Get human-related data in fall mode
+     * @return Retrieved data
+     */
     uint16_t dmHumanData(eDmHuman dh);
-    
+
     /**
      * @fn track
-     * @brief 轨迹点查询
-     * @param x x 坐标
-     * @param y y 坐标
-    */
+     * @brief Track point query
+     * @param x x coordinate
+     * @param y y coordinate
+     */
     void track(uint16_t *x, uint16_t *y);
 
     /**
      * @fn trackFrequency
-     * @brief 获取轨迹点上报频率
-     * @return 返回轨迹点上报频率
-    */
+     * @brief Get track point reporting frequency
+     * @return Retrieved track point reporting frequency
+     */
     uint32_t trackFrequency(void);
 
     /**
-     * @fn unmannedTime
-     * @brief 无人时间查询
-    */
-    uint32_t unmannedTime(void);
+     * @fn getUnmannedTime
+     * @brief Unmanned time query
+     */
+    uint32_t getUnmannedTime(void);
+
+    /**
+     * @fn UnmannedTime
+     * @brief Set unmanned time
+     * @param Time Unmanned time
+     */
+    void dmUnmannedTime(uint32_t Time);
 
     /**
      * @fn getFallData
-     * @brief 获取跌倒检测功能数据
-     * @param dm 数据选择
-     * @return 返回获取的数据
-    */
+     * @brief Get fall detection function data
+     * @param dm Data selection
+     * @return Retrieved data
+     */
     uint16_t getFallData(eDmFall dm);
 
     /**
      * @fn getFallTime
-     * @brief 获取跌倒时长
-     * @return 返回跌倒时长
-    */
+     * @brief Get fall duration
+     * @return Retrieved fall duration
+     */
     uint32_t getFallTime(void);
 
     /**
-     * @fn staticResidencyTime
-     * @brief 驻留时长查询
-     * @return 返回驻留时长
-    */
-    uint32_t staticResidencyTime(void);
+     * @fn dmFallTime
+     * @brief Set fall duration
+     * @param Time Fall duration
+     */
+    void dmFallTime(uint32_t Time);
 
-    
+    /**
+     * @fn getStaticResidencyTime
+     * @brief Residency time query
+     * @return Retrieved residency time
+     */
+    uint32_t getStaticResidencyTime(void);
+
     /**
      * @fn accumulatedHeightDuration
-     * @brief 高度累计时间查询
-     * @return 返回高度累计时间数据
-    */
+     * @brief Height cumulative time query
+     * @return Retrieved height cumulative time data
+     */
     uint32_t accumulatedHeightDuration(void);
 
     /**
      * @fn dmHumanConfig
-     * @brief 配置跌倒模式下人体配置
-     * @param con 配置选择
-     * @param da 配置数据
-     * @return 返回配置状态
-     * @retval 1 配置失败
-     * @retval 0 配置成功
-    */
-    uint8_t dmHumanConfig(eDmHumanConfig con,uint16_t data);
+     * @brief Configure human configuration in fall mode
+     * @param con Configuration selection
+     * @param da Configuration data
+     * @return Configuration status
+     */
+    uint8_t dmHumanConfig(eDmHumanConfig con, uint16_t data);
 
     /**
      * @fn unattendedTimeConfig
-     * @brief 设置在跌倒模式下无人时间查询
-     * @brief time 设置时间
-     * @return 返回设置状态
-     * @retval 0 成功
-     * @retval 1 失败
-    */
+     * @brief Set unmanned time query in fall mode
+     * @brief time Set time
+     * @return Setting status
+     */
     uint8_t unattendedTimeConfig(uint32_t time);
     /**
      * @fn dmFallConfig
-     * @brief 跌倒模式配置
-     * @param con 配置选项
-     * @param data 配置数据
-     * @return 返回配置状态
-     * @retval 0 成功
-     * @retval 1 失败
-     * 
-    */
+     * @brief Fall mode configuration
+     * @param con Configuration option
+     * @param data Configuration data
+     * @return Configuration status
+     *
+     */
     uint8_t dmFallConfig(eDmFallConfig con, uint32_t data);
 
 private:
     /**
      * @fn getData
-     * @brief 发送命令并获取数据
-     * @param con 控制字
-     * @param cmd 命令字
-     * @param len 数据长度
-     * @param senData 发送数据
-     * @param retData 返回数据
-     * @return 返回通信状态
-     * @retval 0 通信正常
-     * @retval 1 超时
-     * @retval 2 通信异常
-    */
+     * @brief Send command and get data
+     * @param con Control word
+     * @param cmd Command word
+     * @param len Data length
+     * @param senData Sent data
+     * @param retData Returned data
+     * @return Communication status
+     */
     uint8_t getData(uint8_t con, uint8_t cmd, uint16_t len, uint8_t *senData, uint8_t *retData);
-    uint8_t sumData(uint8_t len, uint8_t* buf);
+    uint8_t sumData(uint8_t len, uint8_t *buf);
     Stream *_s = NULL;
 };
 
 #endif
+

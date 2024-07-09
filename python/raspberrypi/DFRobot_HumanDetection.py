@@ -3,7 +3,7 @@ import serial
 import time
 
 
-TIME_OUT = 5 #超时时间5秒
+TIME_OUT = 5 # Timeout: 5 seconds
 
 CMD_HEAD   = 0
 CMD_CONFIG = 1
@@ -15,16 +15,16 @@ CMD_END_L  = 6
 CMD_WHITE  = 7
 CMD_DATA =8
 
-SleepMode = 2 #睡眠模式
-FallingMode = 1#跌倒模式
+SleepMode = 2 #sleep mode
+FallingMode = 1# Fall mode
 '''!
-@brief LED灯选择
+@brief LED light selection
 '''
 FALLLed  = 1 
 HPLed    = 2
 
 '''!
-@brief 在睡眠模式下关于人体的数据
+@brief Data about the human body in sleep mode
 '''
 eHumanPresence = 1
 eHumanMovement = 2
@@ -32,8 +32,9 @@ eHumanMovingRange = 3
 eHumanDistance =4
 
 '''!
-@brief 在睡眠模式下的睡眠数据
+@brief Sleep data in sleep mode
 '''
+
 eInOrNotInBed = 1
 eSleepState = 2
 eWakeDuration = 3
@@ -51,7 +52,7 @@ esleepDeadline = 14
 eReportingmode =15
 
 '''!
-@brief 在睡眠模式下睡眠功能配置
+@brief Sleep mode configuration for sleep functionality
 '''
 eReportingmodeC = 1
 eAbnormalStruggleC = 2
@@ -60,7 +61,7 @@ eUnattendedTimeC = 4
 esleepDeadlineC = 5
 
 '''!
-@brief 跌倒模式下人体数据
+@brief Human body data in fall mode
 '''
 eExistence = 1
 eMotion = 2
@@ -70,7 +71,7 @@ eSeatedHorizontalDistance = 5
 eMotionHorizontalDistance = 6
 
 '''!
-@brief 获取跌倒数据
+@brief Get fall data
 '''
 eFallState = 1
 eFallBreakHeight = 2
@@ -80,13 +81,13 @@ estaticResidencySwitch = 5
 eFallSensitivity = 6
 
 '''!
- @brief 跌倒模式下人体配置
+@brief Human configuration in fall mode
 '''
 eSeatedHorizontalDistanceC = 1
 eMotionHorizontalDistanceC = 2
 
 '''!
-@brief 获取跌倒数据
+@brief Get fall data
 '''
 eFallBreakHeightC = 1
 eHeightRatioSwitchC = 2
@@ -107,10 +108,10 @@ class DFRobot_HumanDetection:
     def begin(self):
         '''!
             @fn begin
-            @brief 初始化传感器
-            @return 返回初始化状态
-            @retval 0 初始化成功
-            @retval 1 初始化失败
+            @brief Initialize sensor
+            @return Initialization status
+            @retval 0 Initialization successful
+            @retval 1 Initialization failed
         '''
         time.sleep(6)
         senData = bytearray([0x0f])
@@ -123,11 +124,11 @@ class DFRobot_HumanDetection:
     def config_work_mode(self, mode):
         '''!
             @fn config_work_mode
-            @brief 初始化模式
-            @param mode 模式选择
-            @return 返回初始化状态
-            @retval 0 模式配置成功
-            @retval 1 模式配置失败 
+            @brief Configure working mode
+            @param mode Mode selection
+            @return Configuration status
+            @retval 0 Mode configuration successful
+            @retval 1 Mode configuration failed
         '''
         senData = bytearray(1)
         senData[0] = mode
@@ -144,8 +145,8 @@ class DFRobot_HumanDetection:
     def get_workmode(self):
         '''!
             @fn get_workmode
-            @brief 获取工作模式
-            @return 返回工作模式
+            @brief Get working mode
+            @return Working mode
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x02,0xA8,len(senData),senData)
@@ -156,12 +157,12 @@ class DFRobot_HumanDetection:
     def config_LED_light(self,led,sta):
         '''!
             @fn config_LED_light
-            @brief 配置LED灯
-            @param led 选择打开那个LED灯
-            @param sta 0:打开，1:关闭
-            @return 返回控制啊状态
-            @retval 0 配置成功
-            @retval 1 配置失败
+            @brief Configure LED light
+            @param led LED selection
+            @param sta 0: on, 1: off
+            @return Control status
+            @retval 0 Configuration successful
+            @retval 1 Configuration failed
         '''
         senData = bytearray(1)
         senData[0] = sta
@@ -177,12 +178,11 @@ class DFRobot_HumanDetection:
     
     def get_LED_light_state(self,led):
         '''!
-            @fn get_LED_light_state
-            @brief 获取LED灯的状态
-            @param led LED灯选择
-            @return 返回灯状态
-            @retval 0 灯关闭
-            @retval 1 灯打开
+            @brief Get LED light state
+            @param led LED selection
+            @return Light status
+            @retval 0 Light off
+            @retval 1 Light on
         '''
         senData = bytearray([0x0f])
         if (led == FALLLed):
@@ -198,10 +198,10 @@ class DFRobot_HumanDetection:
     def sensor_ret(self):
         '''!
             @fn sensor_ret
-            @brief 复位传感器
-            @return 返回复位状态
-            @retval 0 复位成功
-            @retval 1 复位失败
+            @brief Reset sensor
+            @return Reset status
+            @retval 0 Reset successful
+            @retval 1 Reset failed
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x01,0x02,len(senData),senData)
@@ -212,8 +212,8 @@ class DFRobot_HumanDetection:
     def sm_human_data(self, hm):
         '''!
             @fn sm_human_data
-            @brief 查询在睡眠模式下人体相关的内容
-            @param hm 获取数据内容选择
+            @brief Query human-related content in sleep mode
+            @param hm Data content selection
         '''
         ret = 0
         senData = bytearray([0x0f])
@@ -238,8 +238,8 @@ class DFRobot_HumanDetection:
     def git_heart_rate(self):
         '''!
             @fn git_heart_rate
-            @brief 获取心率
-            @return 返回心率
+            @brief Get heart rate
+            @return Heart rate
         '''
         senData = bytearray([0x0f])
         ret = 0xff
@@ -251,12 +251,12 @@ class DFRobot_HumanDetection:
     def get_breathe_state(self):
         '''!
             @fn getBreatheState
-            @brief 获取呼吸检测信息
-            @return 返回呼吸信息
-            @retval 1 正常
-            @retval 2 获取过快
-            @retval 3 获取过慢
-            @retval 4 无
+            @brief Get respiratory detection information
+            @return Respiratory information
+            @retval 1 Normal
+            @retval 2 Too fast
+            @retval 3 Too slow
+            @retval 4 None
         '''
         senData = bytearray([0x0f])
         ret = 0xff
@@ -268,8 +268,8 @@ class DFRobot_HumanDetection:
     def get_breathe_value(self):
         '''!
             @fn getBreatheValue
-            @brief 获取呼吸数值
-            @return 返回呼吸数值
+            @brief Obtain respiratory value
+            @return Respiratory value
         '''
         senData = bytearray([0x0f])
         ret = 0xff
@@ -281,9 +281,9 @@ class DFRobot_HumanDetection:
     def sm_sleep_data(self, sl):
         '''!
             @fn sm_sleep_data
-            @brief 获取睡眠相关数据
-            @param sl 需要获取的数据
-            @return 返回获取的数据
+            @brief Obtain sleep-related data
+            @param sl Data to be obtained
+            @return Obtained data
         '''
         senData = bytearray([0x0f])
         ret = 0xff
@@ -352,10 +352,10 @@ class DFRobot_HumanDetection:
     def config_sleep(self,sl,data):
         '''!
             @fn config_sleep
-            @brief 配置睡眠模式功能
-            @param sl 功能选择
-            @param data 配置数据
-            @return 返回设置状态
+            @brief Configure sleep mode functionality
+            @param sl Function selection
+            @param data Configuration data
+            @return Configuration status
         '''
         senData = bytearray(1)
         senData[0] = data
@@ -385,10 +385,10 @@ class DFRobot_HumanDetection:
     def dm_install_angle(self,x,y,z):
         '''!
             @fn dm_install_angle
-            @brief 用于跌倒模式中雷达角度安装设置
-            @param x x 角度
-            @param y y 角度
-            @param z z 角度
+            @brief Used for radar angle installation settings in fall mode
+            @param x x angle
+            @param y y angle
+            @param z z angle
         '''
         senData = bytearray(6)
         senData[0] = x >> 8 & 0xff
@@ -402,10 +402,10 @@ class DFRobot_HumanDetection:
     def dm_get_install_angle(self):
         '''!
             @fn dm_get_install_angle
-            @brief 获取雷达安装角度
-            @param x x 角度
-            @param y y 角度
-            @param z z 角度
+            @brief Obtain radar installation angle
+            @param x x angle
+            @param y y angle
+            @param z z angle
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x06,0x81,len(senData),senData)
@@ -422,8 +422,8 @@ class DFRobot_HumanDetection:
     def dm_install_height(self,he):
         '''!
             @fn dm_install_height
-            @brief 设置雷达安装高度
-            @param he 安装高度
+            @brief Set radar installation height
+            @param he Installation height
         '''
         senData = bytearray(2)
         senData[0] = he >> 8 & 0xff
@@ -433,8 +433,8 @@ class DFRobot_HumanDetection:
     def dm_getInstall_height(self):
         '''!
             @fn dm_getInstall_height
-            @brief 获取安装高度
-            @return 返回获取的安装高度
+            @brief Get installation height
+            @return Installation height
         '''
         senData = bytearray([0x0f])
         ret = 0
@@ -446,8 +446,8 @@ class DFRobot_HumanDetection:
     def dm_auto_measure_height(self):
         '''!
             @fn autoMeasureHeight
-            @brief 获取自动测高数据
-            @return 返回自动测高数据
+            @brief Get automatic height measurement data
+            @return Automatic height measurement data
         '''
         senData = bytearray([0x0f])
         ret = 0
@@ -459,8 +459,8 @@ class DFRobot_HumanDetection:
     def dm_humanData(self, dh):
         '''!
             @fn dmHumanData
-            @brief 在跌倒模式下获取人体相关数据
-            @return 返回获取数据
+            @brief Get human-related data in fall detection mode
+            @return Retrieved data
         '''
         senData = bytearray([0x0f])
         ret = 0
@@ -493,8 +493,8 @@ class DFRobot_HumanDetection:
     def track(self):
         '''!
             @fn track
-            @param x x 坐标
-            @param y y 坐标
+            @param x x coordinate
+            @param y y coordinate
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x83,0x8e,len(senData),senData)
@@ -509,8 +509,8 @@ class DFRobot_HumanDetection:
     def track_frequency(self):
         '''!
             @fn trackFrequency
-            @brief 获取轨迹点上报频率
-            @return 返回轨迹点上报频率
+            @brief Get the frequency of track point reporting.
+            @return Frequency of track point reporting.
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x83,0x93,len(senData),senData)
@@ -522,7 +522,7 @@ class DFRobot_HumanDetection:
     def unmannedTime(self):
         '''!
             @fn unmannedTime
-            @brief 无人时间查询
+            @brief Query unmanned time.
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x80,0x92,len(senData),senData)
@@ -534,9 +534,9 @@ class DFRobot_HumanDetection:
     def getFall_data(self,dm):
         '''!
             @fn getFallData
-            @brief 获取跌倒检测功能数据
-            @param dm 数据选择
-            @return 返回获取的数据
+            @brief Get fall detection data.
+            @param dm Data selection.
+            @return Retrieved data.
         '''
         senData = bytearray([0x0f])
         ret = 0
@@ -569,8 +569,8 @@ class DFRobot_HumanDetection:
     def get_fall_time(self):
         '''!
             @fn getFallTime
-            @brief 获取跌倒时长
-            @return 返回跌倒时长
+            @brief Get fall duration.
+            @return Retrieved fall duration.
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x83,0x8c,len(senData),senData)
@@ -582,8 +582,8 @@ class DFRobot_HumanDetection:
     def static_residency_time(self):
         '''!
             @fn staticResidencyTime
-            @brief 驻留时长查询
-            @return 返回驻留时长
+            @brief Query residency duration.
+            @return Retrieved residency duration.
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x83,0x8a,len(senData),senData)
@@ -595,8 +595,8 @@ class DFRobot_HumanDetection:
     def accumulated_height_duration(self):
         '''!
             @fn accumulatedHeightDuration
-            @brief 高度累计时间查询
-            @return 返回高度累计时间数据
+            @brief Query accumulated height duration.
+            @return Retrieved accumulated height duration data.
         '''
         senData = bytearray([0x0f])
         cmdBuf = self._getData(0x83,0x8F,len(senData),senData)
@@ -608,12 +608,12 @@ class DFRobot_HumanDetection:
     def dm_human_config(self,con,data):
         '''!
             @fn dmHumanConfig
-            @brief 配置跌倒模式下人体配置
-            @param con 配置选择
-            @param da 配置数据
-            @return 返回配置状态
-            @retval 1 配置失败
-            @retval 0 配置成功
+            @brief Configure human settings in fall mode.
+            @param con Configuration selection.
+            @param da Configuration data.
+            @return Configuration status.
+            @retval 1 Configuration failed.
+            @retval 0 Configuration successful.
         '''
         senData = bytearray(2)
         senData[0] = data >> 8 & 0xff
@@ -632,11 +632,11 @@ class DFRobot_HumanDetection:
     def unattended_time_config(self,time):
         '''!
             @fn unattendedTimeConfig
-            @brief 设置在跌倒模式下无人时间查询
-            @brief time 设置时间
-            @return 返回设置状态
-            @retval 0 成功
-            @retval 1 失败
+            @brief Set unattended time query in fall mode.
+            @brief time Set time.
+            @return Setting status.
+            @retval 0 Success.
+            @retval 1 Failure.
         '''
         senData = bytearray(2)
         senData[0] = time >> 24 & 0xff
@@ -652,12 +652,12 @@ class DFRobot_HumanDetection:
     def dm_fall_config(self,con,data):
         '''!
             @fn dmFallConfig
-            @brief 跌倒模式配置
-            @param con 配置选项
-            @param data 配置数据
-            @return 返回配置状态
-            @retval 0 成功
-            @retval 1 失败
+            @brief Configuration of fall mode.
+            @param con Configuration option.
+            @param data Configuration data.
+            @return Configuration status.
+            @retval 0 Success.
+            @retval 1 Failure.
         '''
         senData = bytearray(4)
         ret = 1

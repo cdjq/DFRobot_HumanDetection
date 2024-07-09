@@ -1,284 +1,285 @@
 # DFRobot_HumanDetection
 
-* [English Version](./README_CN.md)
+* [Chinese Version](./README_CN.md)
   
-  这是一个人体毫米波的驱动库，可以实现呼吸睡眠、跌倒检测功能的检测。
-  呼吸睡眠功能基于毫米波雷达体制实现人体生物存在感知及人体运动感知，持续记录人体存在情况，根据睡眠过程中的身体运动幅度变化和呼吸心率变化，对目标的睡眠状态、呼吸心跳频率进行实时判断，在一段睡眠过程结束后输出睡眠评分，根据相关睡眠参数的输出结合到健康康养的应用上。
-  跌倒检测功能是基于人员姿态参数特征做算法判断，通过速度，距离，姿态等运动变化，测目标人员的跌倒状态，持续记录目标是否发生跌倒危险，同时针对长时间异常停留响应静止驻留报警。
+  This is a driver library for human millimeter-wave detection, capable of detecting respiratory sleep and fall detection functions.
+  The respiratory sleep function is based on millimeter-wave radar technology to perceive human biological presence and movement, continuously recording human presence. It real-time judges the sleep status and respiratory heart rate of the target based on changes in body movement amplitude and respiratory rate during sleep. After a sleep period ends, it outputs a sleep score and integrates with health applications based on relevant sleep parameters.
+  Fall detection function uses algorithmic judgment based on personnel posture parameters to detect the fall status of the target through changes in speed, distance, posture, and other movements. It continuously monitors whether the target is at risk of falling and responds to prolonged abnormal stationary states with static residence alarms.
 
 ![Product Image](./resources/images/SEN0623.png)
 
-## 产品链接 (https://www.dfrobot.com.cn/goods-2601.html)
+## Product Link (https://www.dfrobot.com.cn/goods-2601.html)
 
     SKU: SEN0623
 
-## 目录
-  - [概述](#概述)
-  - [库安装](#库安装)
-  - [方法](#方法)
-  - [兼容性](#兼容性)
-  - [版本](#版本)
-  - [创作者](#创作者)
+## Table of Contents
+  - [Overview](#overview)
+  - [Library Installation](#library-installation)
+  - [Methods](#methods)
+  - [Compatibility](#compatibility)
+  - [Version](#version)
+  - [Authors](#authors)
 
-## 概述
-    这是一个人体毫米波的驱动库，可以实现呼吸睡眠、跌倒检测功能的检测。
+## Overview
+    This is a driver library for human millimeter-wave detection, capable of detecting respiratory sleep and fall detection functions.
 
-## 库安装
+## Library Installation
 
-使用此库前，请首先下载库文件，将其粘贴到\Arduino\libraries目录中，然后打开examples文件夹并在该文件夹中运行演示。
-## 方法
+Before using this library, download the library files and paste them into the \Arduino\libraries directory. Then open the examples folder and run the demos in that folder.
+## Methods
 
 ```C++
-  /**
+    /**
      * @fn begin
-     * @brief 初始化传感器
-     * @return 返回初始化状态
-     * @retval 0 初始化成功
-     * @retval 1 初始化失败
+     * @brief Initialize the sensor
+     * @return Initialization status
+     * @retval 0 Initialization successful
+     * @retval 1 Initialization failed
     */
     uint8_t begin(void);
 
     /** 
      * @fn configWorkMode
-     * @brief 初始化模式
-     * @param mode 模式选择
-     * @return 返回初始化状态
-     * @retval 0 模式配置成功
-     * @retval 1 模式配置失败
+     * @brief Initialize mode
+     * @param mode Mode selection
+     * @return Initialization status
+     * @retval 0 Mode configuration successful
+     * @retval 1 Mode configuration failed
     */
     uint8_t configWorkMode(eWorkMode mode);
 
     /**
      * @fn getWorkMode
-     * @brief 获取工作模式
-     * @return 返回工作模式
+     * @brief Get working mode
+     * @return Working mode
     */
     uint8_t getWorkMode(void);
 
     /**
      * @fn configLEDLight
-     * @brief 配置LED灯
-     * @param led 选择打开那个LED灯
-     * @param sta 0:打开，1:关闭
-     * @return 返回控制啊状态
-     * @retval 0 配置成功
-     * @retval 1 配置失败
+     * @brief Configure LED light
+     * @param led LED selection
+     * @param sta 0: On, 1: Off
+     * @return Control status
+     * @retval 0 Configuration successful
+     * @retval 1 Configuration failed
     */
     uint8_t configLEDLight(eLed led, uint8_t sta);
 
     /**
      * @fn getLEDLightStatic
-     * @brief 获取LED灯的状态
-     * @param led LED灯选择
-     * @return 返回灯状态
-     * @retval 0 灯关闭
-     * @retval 1 灯打开
+     * @brief Get LED light status
+     * @param led LED selection
+     * @return Light status
+     * @retval 0 Light off
+     * @retval 1 Light on
     */
     uint8_t getLEDLightState(eLed led);
 
     /**
      * @fn sensorRet
-     * @brief 复位传感器
-     * @return 返回复位状态
-     * @retval 0 复位成功
-     * @retval 1 复位失败
+     * @brief Reset sensor
+     * @return Reset status
+     * @retval 0 Reset successful
+     * @retval 1 Reset failed
     */
     uint8_t sensorRet(void);
 
     /**
      * @fn smHumanData
-     * @brief 查询在睡眠模式下人体相关的内容
-     * @param hm 获取数据内容选择
+     * @brief Query human-related data in sleep mode
+     * @param hm Data selection
     */
     uint16_t smHumanData(esmHuman hm);
 
     /**
      * @fn gitHeartRate
-     * @brief 获取心率
-     * @return 返回心率
+     * @brief Get heart rate
+     * @return Heart rate
     */
     uint8_t gitHeartRate(void);
 
     /**
      * @fn getBreatheState
-     * @brief 获取呼吸检测信息
-     * @return 返回呼吸信息
-     * @retval 1 正常
-     * @retval 2 获取过快
-     * @retval 3 获取过慢
-     * @retval 4 无
+     * @brief Get breath detection information
+     * @return Breath information
+     * @retval 1 Normal
+     * @retval 2 Too fast
+     * @retval 3 Too slow
+     * @retval 4 None
     */
     uint8_t getBreatheState(void);
 
     /**
      * @fn getBreatheValue
-     * @brief 获取呼吸数值
-     * @return 返回呼吸数值
+     * @brief Get breathing value
+     * @return Breathing value
     */
     uint8_t getBreatheValue(void);
 
     /**
      * @fn getSleepSwitch
-     * @brief 获取睡眠相关数据
-     * @param sl 需要获取的数据
-     * @return 返回获取的数据
+     * @brief Get sleep-related data
+     * @param sl Data to retrieve
+     * @return Retrieved data
     */
     uint16_t smSleepData(eSmSleep sl);
 
     /**
      * @fn getSleepComposite
-     * @brief 睡眠综合状态查询
-     * @return 返回综合查询数据
+     * @brief Query sleep composite status
+     * @return Composite query data
     */
     sSleepComposite getSleepComposite(void);
 
     /**
      * @fn getSleepStatistics
-     * @brief 睡眠统计状态查询
-     * @return 返回睡眠统计数据
+     * @brief Query sleep statistics status
+     * @return Sleep statistics data
     */
     sSleepStatistics getSleepStatistics(void);
 
     /**
      * @fn configSleep
-     * @brief 配置睡眠模式功能
-     * @param sl 功能选择
-     * @param data 配置数据
-     * @return 返回设置状态
+     * @brief Configure sleep mode functionality
+     * @param sl Function selection
+     * @param data Configuration data
+     * @return Configuration status
     */
     uint8_t configSleep(eSmSleepConfig sl,uint8_t data);
 
     /**
      * @fn installAngle
-     * @brief 用于跌倒模式中雷达角度安装设置
-     * @param x x 角度
-     * @param y y 角度
-     * @param z z 角度
+     * @brief Radar angle installation setting in fall mode
+     * @param x x angle
+     * @param y y angle
+     * @param z z angle
     */
     void dmInstallAngle(int16_t x, int16_t y, int16_t z);
 
     /**
      * @fn dmGetInstallAngle
-     * @brief 获取雷达安装角度
-     * @param x x 角度
-     * @param y y 角度
-     * @param z z 角度
+     * @brief Get radar installation angle
+     * @param x x angle
+     * @param y y angle
+     * @param z z angle
     */
     void dmGetInstallAngle(int16_t *x, int16_t *y, int16_t *z);
 
     /**
      * @fn dmInstallHeight
-     * @brief 设置雷达安装高度
-     * @param he 安装高度
+     * @brief Set radar installation height
+     * @param he Installation height
     */
     void dmInstallHeight(uint16_t he);
 
     /**
      * @fn dmGetInstallHeight
-     * @brief 获取安装高度
-     * @return 返回获取的安装高度
+     * @brief Get installation height
+     * @return Retrieved installation height
     */
     uint16_t dmGetInstallHeight(void);
 
     /**
      * @fn autoMeasureHeight
-     * @brief 获取自动测高数据
-     * @return 返回自动测高数据
+     * @brief Get automatic height measurement data
+     * @return Automatic height measurement data
     */
     uint16_t dmAutoMeasureHeight(void);
 
     /**
      * @fn dmHumanData
-     * @brief 在跌倒模式下获取人体相关数据
+     * @brief Get human-related data in fall mode
     */
     uint16_t dmHumanData(eDmHuman dh);
     
     /**
      * @fn track
-     * @brief 轨迹点查询
-     * @param x x 坐标
-     * @param y y 坐标
+     * @brief Track point query
+     * @param x x coordinate
+     * @param y y coordinate
     */
     void track(uint16_t *x, uint16_t *y);
 
     /**
      * @fn trackFrequency
-     * @brief 获取轨迹点上报频率
-     * @return 返回轨迹点上报频率
+     * @brief Get track point reporting frequency
+     * @return Track point reporting frequency
     */
     uint32_t trackFrequency(void);
 
     /**
      * @fn unmannedTime
-     * @brief 无人时间查询
+     * @brief Unmanned time query
     */
     uint32_t unmannedTime(void);
 
 
     /**
      * @fn getFallData
-     * @brief 获取跌倒检测功能数据
-     * @param dm 数据选择
-     * @return 返回获取的数据
+     * @brief Get fall detection function data
+     * @param dm Data selection
+     * @return Retrieved data
     */
     uint16_t getFallData(eDmFall dm);
 
     /**
      * @fn getFallTime
-     * @brief 获取跌倒时长
-     * @return 返回跌倒时长
+     * @brief Get fall duration
+     * @return Fall duration
     */
     uint32_t getFallTime(void);
 
     /**
      * @fn staticResidencyTime
-     * @brief 驻留时长查询
-     * @return 返回驻留时长
+     * @brief Static residency time query
+     * @return Residency time
     */
     uint32_t staticResidencyTime(void);
 
     
     /**
      * @fn accumulatedHeightDuration
-     * @brief 高度累计时间查询
-     * @return 返回高度累计时间数据
+     * @brief Accumulated height duration query
+     * @return Accumulated height duration data
     */
     uint32_t accumulatedHeightDuration(void);
 
     /**
      * @fn dmHumanConfig
-     * @brief 配置跌倒模式下人体配置
-     * @param con 配置选择
-     * @param da 配置数据
-     * @return 返回配置状态
-     * @retval 1 配置失败
-     * @retval 0 配置成功
+     * @brief Configure human settings in fall mode
+     * @param con Configuration selection
+     * @param da Configuration data
+     * @return Configuration status
+     * @retval 1 Configuration failed
+     * @retval 0 Configuration successful
     */
     uint8_t dmHumanConfig(eDmHumanConfig con,uint16_t data);
 
     /**
      * @fn unattendedTimeConfig
-     * @brief 设置在跌倒模式下无人时间查询
-     * @brief time 设置时间
-     * @return 返回设置状态
-     * @retval 0 成功
-     * @retval 1 失败
+     * @brief Set unattended time query in fall mode
+     * @brief time Time to set
+     * @return Setting status
+     * @retval 0 Success
+     * @retval 1 Failed
     */
     uint8_t unattendedTimeConfig(uint32_t time);
     /**
      * @fn dmFallConfig
-     * @brief 跌倒模式配置
-     * @param con 配置选项
-     * @param data 配置数据
-     * @return 返回配置状态
-     * @retval 0 成功
-     * @retval 1 失败
+     * @brief Configure fall mode
+     * @param con Configuration option
+     * @param data Configuration data
+     * @return Configuration status
+     * @retval 0 Success
+     * @retval 1 Failed
      * 
     */
     uint8_t dmFallConfig(eDmFallConfig con, uint32_t data);
+
 ```
 
-## 兼容性
+## Compatibility
 
 MCU                | Work Well    | Work Wrong   | Untested    | Remarks
 ------------------ | :----------: | :----------: | :---------: | -----
@@ -288,11 +289,11 @@ Leonardo           |      √       |              |             |
 ESP32              |      √       |              |             | 
 micro:bit          |      √       |              |             | 
 
-## 版本
+## Version
 
-- 2024/6/3 - V1.0.0版本
+- 2024/6/3 - Version V1.0.0
 
-## 创作者
+## Creator
 
 Written by Actor (jie.tang@dfrobot.com), 2019. (Welcome to our [website](https://www.dfrobot.com/))
 

@@ -1,273 +1,274 @@
 DFRobot_HumanDetection
 ===========================
 
-* [English Version](./README_CN.md)
+* [中文版本](./README_CN.md)
 
-这是一个人体毫米波的驱动库，可以实现呼吸睡眠、跌倒检测功能的检测。
-  呼吸睡眠功能基于毫米波雷达体制实现人体生物存在感知及人体运动感知，持续记录人体存在情况，根据睡眠过程中的身体运动幅度变化和呼吸心率变化，对目标的睡眠状态、呼吸心跳频率进行实时判断，在一段睡眠过程结束后输出睡眠评分，根据相关睡眠参数的输出结合到健康康养的应用上。
-  跌倒检测功能是基于人员姿态参数特征做算法判断，通过速度，距离，姿态等运动变化，测目标人员的跌倒状态，持续记录目标是否发生跌倒危险，同时针对长时间异常停留响应静止驻留报警。
+This is a millimeter-wave human detection driver library that can detect breathing, sleep, and fall detection functions. 
+The breathing sleep function is based on millimeter-wave radar system to realize human biological presence and human movement perception. It continuously records human presence, and based on changes in body movement amplitude and respiratory heart rate during sleep, it makes real-time judgments on the target's sleep state, respiratory and heart rate frequency. After a period of sleep, it outputs a sleep score, which can be used in health and wellness applications combined with the output of relevant sleep parameters.
+The fall detection function is based on personnel posture parameter characteristics to make algorithm judgments, measuring the target person's fall state through changes in speed, distance, and posture. It continuously records whether the target is at risk of falling, and responds with a stillness alarm for long periods of abnormal inactivity.
 
-![产品效果图片](../../resources/images/SEN0623.png)
+![Product Effect Picture](../../resources/images/SEN0623.png)
 
-## 产品链接（https://www.dfrobot.com）
+## Product Link (https://www.dfrobot.com)
 
     SKU: SEN0623
-  
-## 目录
 
-  * [概述](#概述)
-  * [库安装](#库安装)
-  * [方法](#方法)
-  * [兼容性](#兼容性)
-  * [历史](#历史)
-  * [创作者](#创作者)
+## Table of Contents
 
-## 概述
+  * [Overview](#overview)
+  * [Library Installation](#library-installation)
+  * [Methods](#methods)
+  * [Compatibility](#compatibility)
+  * [History](#history)
+  * [Credits](#credits)
 
-这是一个人体毫米波的驱动库，可以实现呼吸睡眠、跌倒检测功能的检测。
+## Overview
 
+This is a millimeter-wave human detection driver library that can detect breathing, sleep, and fall detection functions.
 
-## 库安装
+## Library Installation
 
-要使用这个库，首先将库下载到Raspberry Pi，然后打开例程文件夹。要执行一个例程demox.py，请在命令行中输入python demox.py。例如，要执行basics.py例程，你需要输入:
+To use this library, first download the library to your Raspberry Pi, then open the examples folder. To run an example like demox.py, enter python demox.py in the command line. For example, to run the basics.py example, you need to enter:
 
 ```python
 python basics.py
+
 ```
 
-## 方法
+## Methods
 
 ```python
     def begin(self):
         '''!
             @fn begin
-            @brief 初始化传感器
-            @return 返回初始化状态
-            @retval 0 初始化成功
-            @retval 1 初始化失败
+            @brief Initialize the sensor
+            @return Initialization status
+            @retval 0 Initialization successful
+            @retval 1 Initialization failed
         '''
     
     def config_work_mode(self, mode):
         '''!
             @fn config_work_mode
-            @brief 初始化模式
-            @param mode 模式选择
-            @return 返回初始化状态
-            @retval 0 模式配置成功
-            @retval 1 模式配置失败 
+            @brief Initialize mode
+            @param mode Mode selection
+            @return Initialization status
+            @retval 0 Mode configuration successful
+            @retval 1 Mode configuration failed
         '''
     
     def get_workmode(self):
         '''!
             @fn get_workmode
-            @brief 获取工作模式
-            @return 返回工作模式
+            @brief Get work mode
+            @return Current work mode
         '''
     
-    def config_LED_light(self,led,sta):
+    def config_LED_light(self, led, sta):
         '''!
             @fn config_LED_light
-            @brief 配置LED灯
-            @param led 选择打开那个LED灯
-            @param sta 0:打开，1:关闭
-            @return 返回控制啊状态
-            @retval 0 配置成功
-            @retval 1 配置失败
+            @brief Configure the LED light
+            @param led Choose which LED light to turn on
+            @param sta 0: On, 1: Off
+            @return Control status
+            @retval 0 Configuration successful
+            @retval 1 Configuration failed
         '''
     
-    def get_LED_light_state(self,led):
+    def get_LED_light_state(self, led):
         '''!
             @fn get_LED_light_state
-            @brief 获取LED灯的状态
-            @param led LED灯选择
-            @return 返回灯状态
-            @retval 0 灯关闭
-            @retval 1 灯打开
+            @brief Get the state of the LED light
+            @param led LED light selection
+            @return Light status
+            @retval 0 Light off
+            @retval 1 Light on
         '''
     
     def sensor_ret(self):
         '''!
             @fn sensor_ret
-            @brief 复位传感器
-            @return 返回复位状态
-            @retval 0 复位成功
-            @retval 1 复位失败
+            @brief Reset the sensor
+            @return Reset status
+            @retval 0 Reset successful
+            @retval 1 Reset failed
         '''
 
     def sm_human_data(self, hm):
         '''!
             @fn sm_human_data
-            @brief 查询在睡眠模式下人体相关的内容
-            @param hm 获取数据内容选择
+            @brief Query human-related data in sleep mode
+            @param hm Data selection
         '''
 
     def git_heart_rate(self):
         '''!
             @fn git_heart_rate
-            @brief 获取心率
-            @return 返回心率
+            @brief Get heart rate
+            @return Heart rate
         '''
 
     def get_breathe_state(self):
         '''!
             @fn getBreatheState
-            @brief 获取呼吸检测信息
-            @return 返回呼吸信息
-            @retval 1 正常
-            @retval 2 获取过快
-            @retval 3 获取过慢
-            @retval 4 无
+            @brief Get breathing detection information
+            @return Breathing information
+            @retval 1 Normal
+            @retval 2 Too fast
+            @retval 3 Too slow
+            @retval 4 None
         '''
 
     def get_breathe_value(self):
         '''!
             @fn getBreatheValue
-            @brief 获取呼吸数值
-            @return 返回呼吸数值
+            @brief Get breathing values
+            @return Breathing values
         '''
 
     def sm_sleep_data(self, sl):
         '''!
             @fn sm_sleep_data
-            @brief 获取睡眠相关数据
-            @param sl 需要获取的数据
-            @return 返回获取的数据
+            @brief Get sleep-related data
+            @param sl Data to be retrieved
+            @return Retrieved data
         '''
 
-    def config_sleep(self,sl,data):
+    def config_sleep(self, sl, data):
         '''!
             @fn config_sleep
-            @brief 配置睡眠模式功能
-            @param sl 功能选择
-            @param data 配置数据
-            @return 返回设置状态
+            @brief Configure sleep mode function
+            @param sl Function selection
+            @param data Configuration data
+            @return Setting status
         '''
     
-    def dm_install_angle(self,x,y,z):
+    def dm_install_angle(self, x, y, z):
         '''!
             @fn dm_install_angle
-            @brief 用于跌倒模式中雷达角度安装设置
-            @param x x 角度
-            @param y y 角度
-            @param z z 角度
+            @brief Set radar angle installation in fall mode
+            @param x X angle
+            @param y Y angle
+            @param z Z angle
         '''
 
     def dm_get_install_angle(self):
         '''!
             @fn dm_get_install_angle
-            @brief 获取雷达安装角度
-            @param x x 角度
-            @param y y 角度
-            @param z z 角度
+            @brief Get radar installation angle
+            @return Radar installation angles
         '''
     
-    def dm_install_height(self,he):
+    def dm_install_height(self, he):
         '''!
             @fn dm_install_height
-            @brief 设置雷达安装高度
-            @param he 安装高度
+            @brief Set radar installation height
+            @param he Installation height
         '''
 
     def dm_getInstall_height(self):
         '''!
             @fn dm_getInstall_height
-            @brief 获取安装高度
-            @return 返回获取的安装高度
+            @brief Get installation height
+            @return Installation height
         '''
     
     def dm_auto_measure_height(self):
         '''!
             @fn autoMeasureHeight
-            @brief 获取自动测高数据
-            @return 返回自动测高数据
+            @brief Get auto height measurement data
+            @return Auto height measurement data
         '''
     
     def dm_humanData(self, dh):
         '''!
             @fn dmHumanData
-            @brief 在跌倒模式下获取人体相关数据
-            @return 返回获取数据
+            @brief Get human-related data in fall mode
+            @return Retrieved data
         '''
 
     def track(self):
         '''!
             @fn track
-            @param x x 坐标
-            @param y y 坐标
+            @brief Track coordinates
+            @param x X coordinate
+            @param y Y coordinate
         '''
     
     def track_frequency(self):
         '''!
             @fn trackFrequency
-            @brief 获取轨迹点上报频率
-            @return 返回轨迹点上报频率
+            @brief Get track point reporting frequency
+            @return Reporting frequency
         '''
+    
     def unmannedTime(self):
         '''!
             @fn unmannedTime
-            @brief 无人时间查询
+            @brief Query unmanned time
         '''
 
-    def getFall_data(self,dm):
+    def getFall_data(self, dm):
         '''!
             @fn getFallData
-            @brief 获取跌倒检测功能数据
-            @param dm 数据选择
-            @return 返回获取的数据
+            @brief Get fall detection function data
+            @param dm Data selection
+            @return Retrieved data
         '''
     
     def get_fall_time(self):
         '''!
             @fn getFallTime
-            @brief 获取跌倒时长
-            @return 返回跌倒时长
+            @brief Get fall duration
+            @return Fall duration
         '''
     
     def static_residency_time(self):
         '''!
             @fn staticResidencyTime
-            @brief 驻留时长查询
-            @return 返回驻留时长
+            @brief Query residency time
+            @return Residency time
         '''
         
     def accumulated_height_duration(self):
         '''!
             @fn accumulatedHeightDuration
-            @brief 高度累计时间查询
-            @return 返回高度累计时间数据
+            @brief Query accumulated height duration
+            @return Accumulated height duration data
         '''
     
-    def dm_human_config(self,con,data):
+    def dm_human_config(self, con, data):
         '''!
             @fn dmHumanConfig
-            @brief 配置跌倒模式下人体配置
-            @param con 配置选择
-            @param da 配置数据
-            @return 返回配置状态
-            @retval 1 配置失败
-            @retval 0 配置成功
+            @brief Configure human settings in fall mode
+            @param con Configuration selection
+            @param data Configuration data
+            @return Configuration status
+            @retval 1 Configuration failed
+            @retval 0 Configuration successful
         '''
 
-    def unattended_time_config(self,time):
+    def unattended_time_config(self, time):
         '''!
             @fn unattendedTimeConfig
-            @brief 设置在跌倒模式下无人时间查询
-            @brief time 设置时间
-            @return 返回设置状态
-            @retval 0 成功
-            @retval 1 失败
+            @brief Set unattended time query in fall mode
+            @param time Set time
+            @return Setting status
+            @retval 0 Successful
+            @retval 1 Failed
         '''
     
-    def dm_fall_config(self,con,data):
+    def dm_fall_config(self, con, data):
         '''!
             @fn dmFallConfig
-            @brief 跌倒模式配置
-            @param con 配置选项
-            @param data 配置数据
-            @return 返回配置状态
-            @retval 0 成功
-            @retval 1 失败
+            @brief Fall mode configuration
+            @param con Configuration option
+            @param data Configuration data
+            @return Configuration status
+            @retval 0 Successful
+            @retval 1 Failed
         '''
+
 ```
 
 ## Compatibility
@@ -289,7 +290,7 @@ python basics.py
 
 ## History
 
-- 2024-06-3 - 1.0.0 版本
+- 2024-06-3 - Version 1.0.0
 
 ## Credits
 

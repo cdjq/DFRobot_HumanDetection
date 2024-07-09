@@ -1,6 +1,6 @@
 /**！
- * @file basics.ino
- * @brief 这是人体毫米波雷达的基础使用例程
+ * @file sleep.ino
+ * @brief This is an example of the C1001 mmWave Human Detection Sensor detecting the presence of people and their respiration and heart rates.
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @license     The MIT License (MIT)
  * @author [tangjie](jie.tang@dfrobot.com)
@@ -8,97 +8,90 @@
  * @date  2024-06-03
  * @url https://github.com/DFRobot/DFRobot_HumanDetection
  */
-
 #include "DFRobot_HumanDetection.h"
 
 DFRobot_HumanDetection hu(&Serial1);
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
-  // Serial.println(1000);
   Serial1.begin(115200, SERIAL_8N1, 4, 5);
-  while (hu.begin() != 0)
-  {
+
+  Serial.println("Start initialization");
+  while (hu.begin() != 0) {
     Serial.println("init error!!!");
     delay(1000);
   }
-  Serial.println("init success");
-  delay(100);
-  while (hu.configWorkMode(hu.eSleepMode) != 0)
-  {
-    Serial.println("init error!!!");
+  Serial.println("Initialization successful");
+
+  Serial.println("Start switching work mode");
+  while (hu.configWorkMode(hu.eSleepMode) != 0) {
+    Serial.println("error!!!");
     delay(1000);
   }
-  Serial.println("init success");
+  Serial.println("Work mode switch successful");
 
-  Serial.print("工作模式：");
-  switch (hu.getWorkMode())
-  {
-  case 1:
-    Serial.println("跌倒模式");
-    break;
-  case 2:
-    Serial.println("睡眠模式");
-    break;
-  default:
-    Serial.println("读取错误");
+  Serial.print("Current work mode:");
+  switch (hu.getWorkMode()) {
+    case 1:
+      Serial.println("Fall detection mode");
+      break;
+    case 2:
+      Serial.println("Sleep detection mode");
+      break;
+    default:
+      Serial.println("Read error");
   }
 
-  hu.configLEDLight(hu.eHPLed, 1); // 设置HP LED开关
+  hu.configLEDLight(hu.eHPLed, 1);  // Set HP LED switch, it will not light up even if the sensor detects a person when set to 0.
+  hu.sensorRet();                   // Module reset, must perform sensorRet after setting data, otherwise the sensor may not be usable
 
-  Serial.print("HP LED状态：");
-  switch (hu.getLEDLightState(hu.eHPLed))
-  {
-  case 0:
-    Serial.println("关");
-    break;
-  case 1:
-    Serial.println("开");
-    break;
-  default:
-    Serial.println("读取错误");
+  Serial.print("HP LED status:");
+  switch (hu.getLEDLightState(hu.eHPLed)) {
+    case 0:
+      Serial.println("Off");
+      break;
+    case 1:
+      Serial.println("On");
+      break;
+    default:
+      Serial.println("Read error");
   }
+
   Serial.println();
   Serial.println();
 }
 
-void loop()
-{
-  Serial.print("存在信息：");
-  switch (hu.smHumanData(hu.eHumanPresence))
-  {
-  case 0:
-    Serial.println("无人存在");
-    break;
-  case 1:
-    Serial.println("有人存在");
-    break;
-  default:
-    Serial.println("读取错误");
+void loop() {
+  Serial.print("Existing information:");
+  switch (hu.smHumanData(hu.eHumanPresence)) {
+    case 0:
+      Serial.println("No one is present");
+      break;
+    case 1:
+      Serial.println("Someone is present");
+      break;
+    default:
+      Serial.println("Read error");
   }
 
-  Serial.print("运动信息：");
-  switch (hu.smHumanData(hu.eHumanMovement))
-  {
-  case 0:
-    Serial.println("无");
-    break;
-  case 1:
-    Serial.println("静止");
-    break;
-  case 2:
-    Serial.println("活跃");
-    break;
-  default:
-    Serial.println("读取错误");
+  Serial.print("Motion information:");
+  switch (hu.smHumanData(hu.eHumanMovement)) {
+    case 0:
+      Serial.println("None");
+      break;
+    case 1:
+      Serial.println("Still");
+      break;
+    case 2:
+      Serial.println("Active");
+      break;
+    default:
+      Serial.println("Read error");
   }
 
-  Serial.printf("体动参数：%d\n", hu.smHumanData(hu.eHumanMovingRange));
-
-  Serial.printf("呼吸频率：%d\n", hu.getBreatheValue());
-  Serial.printf("心跳频率：%d\n", hu.gitHeartRate());
-
+  Serial.printf("Body movement parameters:%d\n", hu.smHumanData(hu.eHumanMovingRange));
+  Serial.printf("Respiration rate:%d\n", hu.getBreatheValue());
+  Serial.printf("Heart rate:%d\n", hu.gitHeartRate());
   Serial.println();
   delay(1000);
 }
