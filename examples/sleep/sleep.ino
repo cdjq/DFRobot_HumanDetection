@@ -1,6 +1,15 @@
 /**！
  * @file sleep.ino
  * @brief This is an example of sleep detection using human millimeter wave radar.
+ * 
+ * ---------------------------------------------------------------------------------------------------------------
+ *    board   |             MCU                | Leonardo/Mega2560/M0 |    UNO    | ESP8266 | ESP32 |  microbit  |
+ *     VCC    |            3.3V/5V             |        VCC           |    VCC    |   VCC   |  VCC  |     X      |
+ *     GND    |              GND               |        GND           |    GND    |   GND   |  GND  |     X      |
+ *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  D2   |     X      |
+ *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  D3   |     X      |
+ * ---------------------------------------------------------------------------------------------------------------
+ * 
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @license     The MIT License (MIT)
  * @author [tangjie](jie.tang@dfrobot.com)
@@ -8,13 +17,29 @@
  * @date  2024-06-03
  * @url https://github.com/DFRobot/DFRobot_HumanDetection
  */
-#include "DFRobot_HumanDetection.h"
 
-DFRobot_HumanDetection hu(&Serial1);
+#include "DFRobot_HumanDetection.h"
+#if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+#include <SoftwareSerial.h>
+#endif
+
+#if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+  SoftwareSerial mySerial(/*rx =*/4, /*tx =*/5);
+  DFRobot_HumanDetection hu(&mySerial);
+#else
+  DFRobot_HumanDetection hu(&Serial1);
+#endif
 
 void setup() {
   Serial.begin(115200);
-  Serial1.begin(115200, SERIAL_8N1, 4, 5);
+
+  #if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+  mySerial.begin(115200);
+  #elif defined(ESP32)
+  Serial1.begin(115200, SERIAL_8N1, /*rx =*/D3, /*tx =*/D2);
+  #else
+  Serial1.begin(115200);
+  #endif
 
   Serial.println("Start initialization");
   while (hu.begin() != 0) {
@@ -91,9 +116,12 @@ void loop() {
     default:
       Serial.println("Read error");
   }
-  Serial.printf("Awake duration: %d\n", hu.smSleepData(hu.eWakeDuration));
-  Serial.printf("Deep sleep duration: %d\n", hu.smSleepData(hu.eDeepSleepDuration));
-  Serial.printf("Sleep quality score: %d\n", hu.smSleepData(hu.eSleepQuality));
+  Serial.print("Awake duration: ");
+  Serial.println(hu.smSleepData(hu.eWakeDuration));
+  Serial.print("Deep sleep duration: ");
+  Serial.println(hu.smSleepData(hu.eDeepSleepDuration));
+  Serial.print("Sleep quality score: ");
+  Serial.println( hu.smSleepData(hu.eSleepQuality));
 
   sSleepComposite comprehensiveState = hu.getSleepComposite();
   Serial.println("Comprehensive sleep status:{");
@@ -128,12 +156,18 @@ void loop() {
       Serial.println("Read error");
   }
 
-  Serial.printf("\tAverage respiration rate: %d\n", comprehensiveState.averageRespiration);
-  Serial.printf("\tAverage heart rate: %d\n", comprehensiveState.averageHeartbeat);
-  Serial.printf("\tNumber of turns: %d\n", comprehensiveState.turnoverNumber);
-  Serial.printf("\tProportion of significant body movement: %d\n", comprehensiveState.largeBodyMove);
-  Serial.printf("\tProportion of minor body movement: %d\n", comprehensiveState.minorBodyMove);
-  Serial.printf("\tNumber of apneas: %d\n", comprehensiveState.apneaEvents);
+  Serial.print("\tAverage respiration rate: ");
+  Serial.println(comprehensiveState.averageRespiration);
+  Serial.print("\tAverage heart rate: ");
+  Serial.println(comprehensiveState.averageHeartbeat);
+  Serial.print("\tNumber of turns: ");
+  Serial.println(comprehensiveState.turnoverNumber);
+  Serial.print("\tProportion of significant body movement: ");
+  Serial.println(comprehensiveState.largeBodyMove);
+  Serial.print("\tProportion of minor body movement: ");
+  Serial.println(comprehensiveState.minorBodyMove);
+  Serial.print("\tNumber of apneas: ");
+  Serial.println(comprehensiveState.apneaEvents);
   Serial.println("}");
 
   Serial.print("Sleep abnormalities:");
@@ -156,16 +190,26 @@ void loop() {
 
   sSleepStatistics statistics = hu.getSleepStatistics();  // Get sleep statistics, the sensor reports the whole night's sleep statistics data when it judges the sleep process to be over.
   Serial.println("Sleep statistics:{");
-  Serial.printf("\tSleep quality score: %d\n", statistics.sleepQualityScore);
-  Serial.printf("\tProportion of awake time: %d\n", statistics.sleepTime);
-  Serial.printf("\tProportion of light sleep time: %d\n", statistics.wakeDuration);
-  Serial.printf("\tProportion of light sleep time: %d\n", statistics.shallowSleepPercentage);
-  Serial.printf("\tProportion of deep sleep time: %d\n", statistics.deepSleepPercentage);
-  Serial.printf("\tOut of bed duration: %d\n", statistics.timeOutOfBed);
-  Serial.printf("\tNumber of times out of bed: %d\n", statistics.exitCount);
-  Serial.printf("\tNumber of turns: %d\n", statistics.turnOverCount);
-  Serial.printf("\tAverage respiration: %d\n", statistics.averageRespiration);
-  Serial.printf("\tAverage heartbeat: %d\n", statistics.averageHeartbeat);
+  Serial.print("\tSleep quality score: ");
+  Serial.println(statistics.sleepQualityScore);
+  Serial.print("\tProportion of awake time: ");
+  Serial.println(statistics.sleepTime);
+  Serial.print("\tProportion of light sleep time: ");
+  Serial.println(statistics.wakeDuration);
+  Serial.print("\tProportion of light sleep time: ");
+  Serial.println(statistics.shallowSleepPercentage);
+  Serial.print("\tProportion of deep sleep time: ");
+  Serial.println(statistics.deepSleepPercentage);
+  Serial.print("\tOut of bed duration: ");
+  Serial.println(statistics.timeOutOfBed);
+  Serial.print("\tNumber of times out of bed: ");
+  Serial.println(statistics.exitCount);
+  Serial.print("\tNumber of turns: ");
+  Serial.println(statistics.turnOverCount);
+  Serial.print("\tAverage respiration: ");
+  Serial.println(statistics.averageRespiration);
+  Serial.print("\tAverage heartbeat: ");
+  Serial.println(statistics.averageHeartbeat);
   Serial.println("}");
 
   Serial.print("Sleep quality rating: ");

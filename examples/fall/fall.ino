@@ -1,6 +1,15 @@
 /**！
  * @file basics.ino
  * @brief This is the fall detection usage routine of the C1001 mmWave Human Detection Sensor.
+ * 
+ * ---------------------------------------------------------------------------------------------------------------
+ *    board   |             MCU                | Leonardo/Mega2560/M0 |    UNO    | ESP8266 | ESP32 |  microbit  |
+ *     VCC    |            3.3V/5V             |        VCC           |    VCC    |   VCC   |  VCC  |     X      |
+ *     GND    |              GND               |        GND           |    GND    |   GND   |  GND  |     X      |
+ *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  D2   |     X      |
+ *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  D3   |     X      |
+ * ---------------------------------------------------------------------------------------------------------------
+ * 
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @license     The MIT License (MIT)
  * @author [tangjie](jie.tang@dfrobot.com)
@@ -10,12 +19,27 @@
  */
 
 #include "DFRobot_HumanDetection.h"
+#if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+#include <SoftwareSerial.h>
+#endif
 
-DFRobot_HumanDetection hu(&Serial1);
+#if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+  SoftwareSerial mySerial(/*rx =*/4, /*tx =*/5);
+  DFRobot_HumanDetection hu(&mySerial);
+#else
+  DFRobot_HumanDetection hu(&Serial1);
+#endif
 
 void setup() {
   Serial.begin(115200);
-  Serial1.begin(115200, SERIAL_8N1, 4, 5);
+
+  #if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+  mySerial.begin(115200);
+  #elif defined(ESP32)
+  Serial1.begin(115200, SERIAL_8N1, /*rx =*/D3, /*tx =*/D2);
+  #else
+  Serial1.begin(115200);
+  #endif
 
   Serial.println("Start initialization");
   while (hu.begin() != 0) {
@@ -75,13 +99,22 @@ void setup() {
       Serial.println("Read error");
   }
 
-  Serial.printf("Radar installation height: %d cm\n", hu.dmGetInstallHeight());
-  Serial.printf("Fall duration: %d seconds\n", hu.getFallTime());
-  Serial.printf("Unattended duration: %d seconds\n", hu.getUnmannedTime());
-  Serial.printf("Dwell duration: %d seconds\n", hu.getStaticResidencyTime());
-  Serial.printf("Fall sensitivity: %d \n", hu.getFallData(hu.eFallSensitivity));
-  Serial.println();
-  Serial.println();
+  Serial.print("Radar installation height: ");
+  Serial.print(hu.dmGetInstallHeight());
+  Serial.println(" cm");
+  Serial.print("Fall duration: ");
+  Serial.print(hu.getFallTime());
+  Serial.println(" seconds");
+  Serial.print("Unattended duration: ");
+  Serial.print(hu.getUnmannedTime());
+  Serial.println(" seconds");
+  Serial.print("Dwell duration: ");
+  Serial.print(hu.getStaticResidencyTime());
+  Serial.println(" seconds");
+  Serial.print("Fall sensitivity: ");
+  Serial.print(hu.getFallData(hu.eFallSensitivity));
+  Serial.println(" seconds");
+  Serial.println("===============================");
 }
 
 void loop() {
@@ -112,7 +145,9 @@ void loop() {
       Serial.println("Read error");
   }
 
-  Serial.printf("Body movement parameters:%d\n", hu.smHumanData(hu.eHumanMovingRange));
+  Serial.print("Body movement parameters: ");
+  Serial.print( hu.smHumanData(hu.eHumanMovingRange));
+
   Serial.print("Fall status:");
   switch (hu.getFallData(hu.eFallState)) {
     case 0:
@@ -125,7 +160,7 @@ void loop() {
       Serial.println("Read error");
   }
 
-  Serial.print("Stationary dwell status:");
+  Serial.print("Stationary dwell status: ");
   switch (hu.getFallData(hu.estaticResidencyState)) {
     case 0:
       Serial.println("No stationary dwell");

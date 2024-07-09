@@ -1,6 +1,15 @@
 /**！
  * @file sleep.ino
  * @brief This is an example of the C1001 mmWave Human Detection Sensor detecting the presence of people and their respiration and heart rates.
+ * 
+ * ---------------------------------------------------------------------------------------------------------------
+ *    board   |             MCU                | Leonardo/Mega2560/M0 |    UNO    | ESP8266 | ESP32 |  microbit  |
+ *     VCC    |            3.3V/5V             |        VCC           |    VCC    |   VCC   |  VCC  |     X      |
+ *     GND    |              GND               |        GND           |    GND    |   GND   |  GND  |     X      |
+ *     RX     |              TX                |     Serial1 TX1      |     5     |   5/D6  |  D2   |     X      |
+ *     TX     |              RX                |     Serial1 RX1      |     4     |   4/D7  |  D3   |     X      |
+ * ---------------------------------------------------------------------------------------------------------------
+ * 
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @license     The MIT License (MIT)
  * @author [tangjie](jie.tang@dfrobot.com)
@@ -9,12 +18,28 @@
  * @url https://github.com/DFRobot/DFRobot_HumanDetection
  */
 #include "DFRobot_HumanDetection.h"
+#if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+#include <SoftwareSerial.h>
+#endif
 
-DFRobot_HumanDetection hu(&Serial1);
+#if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+  SoftwareSerial mySerial(/*rx =*/4, /*tx =*/5);
+  DFRobot_HumanDetection hu(&mySerial);
+#else
+  DFRobot_HumanDetection hu(&Serial1);
+#endif
+
 
 void setup() {
   Serial.begin(115200);
-  Serial1.begin(115200, SERIAL_8N1, 4, 5);
+  
+  #if defined(ARDUINO_AVR_UNO)||defined(ESP8266)
+  mySerial.begin(115200);
+  #elif defined(ESP32)
+  Serial1.begin(115200, SERIAL_8N1, /*rx =*/D3, /*tx =*/D2);
+  #else
+  Serial1.begin(115200);
+  #endif
 
   Serial.println("Start initialization");
   while (hu.begin() != 0) {
@@ -89,9 +114,12 @@ void loop() {
       Serial.println("Read error");
   }
 
-  Serial.printf("Body movement parameters:%d\n", hu.smHumanData(hu.eHumanMovingRange));
-  Serial.printf("Respiration rate:%d\n", hu.getBreatheValue());
-  Serial.printf("Heart rate:%d\n", hu.gitHeartRate());
-  Serial.println();
+  Serial.print("Body movement parameters: ");
+  Serial.println(hu.smHumanData(hu.eHumanMovingRange));
+  Serial.print("Respiration rate: ");
+  Serial.println(hu.getBreatheValue());
+  Serial.print("Heart rate: ");
+  Serial.println(hu.gitHeartRate());
+  Serial.println("-----------------------");
   delay(1000);
 }
